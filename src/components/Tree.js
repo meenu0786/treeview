@@ -12,43 +12,26 @@ const Tree = () => {
     setExpanded(expanded);
   };
 
+  const filterData = nodeLable => {
+    const ftr = Object.keys(printValue)
+      .filter(label => label !== nodeLable)
+      .reduce((res, key) => ((res[key] = printValue[key]), res), {});
+    setPrintValue(ftr);
+  };
+
   const onCheck = (checked, nodes) => {
     if (nodes.children === undefined) {
       if (!checked.includes(nodes.value)) {
-        const filtered = printValue[nodes.parent.label].filter(
-          label => label != nodes.label
-        );
-        if (filtered.length > 0) {
-          setPrintValue({ ...printValue, [nodes.parent.label]: filtered });
-        } else {
-          const ftr = Object.keys(printValue)
-            .filter(label => label != nodes.parent.label)
-            .reduce((res, key) => ((res[key] = printValue[key]), res), {});
-          setPrintValue(ftr);
-        }
+        const filtered = printValue[nodes.parent.label].filter( label => label !== nodes.label);
+        {filtered.length > 0 ? setPrintValue({ ...printValue, [nodes.parent.label]: filtered }) : filterData(nodes.parent.label)}
       } else {
         let temp = printValue[nodes.parent.label];
-        if (temp) {
-          temp.push(nodes.label);
-        } else {
-          temp = [nodes.label];
-        }
-        setPrintValue({
-          ...printValue,
-          [nodes.parent.label]: temp,
-        });
+        {temp ? temp.push(nodes.label) : (temp = [nodes.label]);}
+        setPrintValue({...printValue,[nodes.parent.label]: temp});
       }
     } else {
-      if (!checked.includes(nodes.value)) {
-        const filtered = Object.keys(printValue)
-          .filter(label => label != nodes.label)
-          .reduce((res, key) => ((res[key] = printValue[key]), res), {});
-        setPrintValue(filtered);
-      } else {
-        setPrintValue({ ...printValue, [nodes.label]: null });
-      }
+      {!checked.includes(nodes.value) ? filterData(nodes.label) : setPrintValue({ ...printValue, [nodes.label]: null })}
     }
-
     setChecked(checked);
   };
 
